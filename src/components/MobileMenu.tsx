@@ -101,9 +101,9 @@ const MobileMenu: React.FC = () => {
                   <motion.div key={`level-${menuStack.length}`} initial={{ opacity: 0, x: shouldReduce ? 0 : 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: shouldReduce ? 0 : -50 }} transition={{ duration: 0.3 }} className="space-y-3">
                     <button
                       onClick={menuStack.length > 0 ? popMenu : close}
-                      className="flex items-center gap-2 text-gray-600 font-medium mb-2"
+                      className="cursor-pointer flex items-center gap-2 text-gray-600 font-medium mb-2"
                     >
-                      <ArrowLeft className="w-4 h-4" /> Back
+                      <ArrowLeft className="w-4 h-4 cursor-pointer" /> Back
                     </button>
                     {menuStack[menuStack.length - 1] && (
                       <MenuList
