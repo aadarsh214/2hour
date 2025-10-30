@@ -1,175 +1,9 @@
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import { motion, AnimatePresence, useReducedMotion } from "framer-motion";
-import {
-  Home,
-  Box,
-  Building2,
-  BookOpen,
-  Headphones,
-  Lightbulb,
-  Leaf,
-  TrendingUp,
-  Mail,
-  ArrowLeft,
-  ChevronRight,
-  GripHorizontal,
-  Cloud,
-  Code2,
-  Workflow,
-  UsersRound,
-  Server,
-  Shield,
-  Zap,
-  type LucideIcon,
-} from "lucide-react";
-
-interface MenuItem {
-  icon: LucideIcon;
-  title: string;
-  subtitle: string;
-  sub?: MenuItem[];
-}
-
-const mainMenu: MenuItem[] = [
-  {
-    icon: Home,
-    title: "Home",
-    subtitle: "Welcome to our comprehensive platform",
-  },
-  {
-    icon: Box,
-    title: "Products & Services",
-    subtitle: "Explore our comprehensive offerings",
-    sub: [
-      {
-        icon: Server,
-        title: "Software Solutions",
-        subtitle: "Custom software development and deployment",
-      },
-      {
-        icon: Cloud,
-        title: "Cloud & Infrastructure",
-        subtitle: "Scalable cloud solutions and infrastructure",
-      },
-      {
-        icon: Headphones, // reusing to keep bundle small; represents consulting
-        title: "Consulting Services",
-        subtitle: "Expert guidance and strategic support",
-        sub: [
-          {
-            icon: Server,
-            title: "Technical Consulting",
-            subtitle: "Architecture and implementation guidance",
-            sub: [
-              {
-                icon: Server,
-                title: "System Architecture",
-                subtitle: "Scalable system design and planning",
-              },
-              {
-                icon: Zap,
-                title: "Performance Optimization",
-                subtitle: "Application and system optimization",
-              },
-              {
-                icon: Shield,
-                title: "Security Audits",
-                subtitle: "Comprehensive security assessments",
-              },
-            ],
-          },
-          {
-            icon: TrendingUp,
-            title: "Business Strategy",
-            subtitle: "Digital transformation and business planning",
-          },
-          {
-            icon: BookOpen,
-            title: "Training & Workshops",
-            subtitle: "Team skill development and knowledge transfer",
-            sub: [
-              {
-                icon: Code2,
-                title: "Technical Training",
-                subtitle: "Programming and technology skills",
-              },
-              {
-                icon: Workflow,
-                title: "Agile Methodologies",
-                subtitle: "Scrum, Kanban, and agile practices",
-              },
-              {
-                icon: UsersRound,
-                title: "Leadership & Management",
-                subtitle: "Technical leadership and team management",
-              },
-            ],
-          },
-        ],
-      },
-      {
-        icon: Lightbulb,
-        title: "Digital Transformation",
-        subtitle: "Comprehensive digital transformation strategies",
-      },
-      {
-        icon: Shield,
-        title: "Cybersecurity Consulting",
-        subtitle: "Comprehensive cybersecurity solutions",
-      },
-      {
-        icon: BookOpen,
-        title: "Data & Analytics Consulting",
-        subtitle: "Data strategy, analytics, and business intelligence",
-      },
-      {
-        icon: Zap,
-        title: "DevOps & Platform Engineering",
-        subtitle: "DevOps transformation and platform engineering",
-      },
-      {
-        icon: Headphones,
-        title: "Support & Maintenance",
-        subtitle: "Ongoing maintenance and support services",
-      },
-    ],
-  },
-  {
-    icon: Building2,
-    title: "Industry Solutions",
-    subtitle: "Specialized solutions for different industries",
-  },
-  {
-    icon: BookOpen,
-    title: "Resources",
-    subtitle: "Knowledge base, tools, and learning materials",
-  },
-  {
-    icon: Headphones,
-    title: "Support",
-    subtitle: "Get help and support when you need it",
-  },
-  {
-    icon: Lightbulb,
-    title: "Research & Innovation",
-    subtitle: "Cutting-edge research and innovation initiatives",
-  },
-  {
-    icon: Leaf,
-    title: "Sustainability",
-    subtitle: "Environmental responsibility and sustainable technology",
-  },
-  {
-    icon: TrendingUp,
-    title: "Investor Relations",
-    subtitle: "Financial information and investor resources",
-  },
-  {
-    icon: Mail,
-    title: "Contact",
-    subtitle: "Get in touch with our team",
-  },
-];
+import { ArrowLeft, GripHorizontal } from "lucide-react";
+import type { MenuItem } from "./menu/types";
+import { mainMenu } from "./menu/data";
+import MenuList from "./menu/MenuList";
 
 const MobileMenu: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -262,62 +96,21 @@ const MobileMenu: React.FC = () => {
               <div className="overflow-y-auto p-5 pt-3 max-h-[calc(92dvh-44px)]">
               <AnimatePresence mode="wait">
                 {menuStack.length === 0 ? (
-                  <motion.div
-                    key="main"
-                    initial={{ opacity: 0, x: shouldReduce ? 0 : 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: shouldReduce ? 0 : -50 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-3"
-                  >
-                    {mainMenu.map((item) => (
-                      <div
-                        key={item.title}
-                        onClick={() => pushMenu(item.sub)}
-                        className="flex items-start justify-between p-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition"
-                      >
-                        <div className="flex items-start gap-3">
-                          <item.icon className="w-5 h-5 text-gray-700 mt-1" />
-                          <div>
-                            <h3 className="font-medium text-gray-900">{item.title}</h3>
-                            <p className="text-sm text-gray-500">{item.subtitle}</p>
-                          </div>
-                        </div>
-                        {item.sub && <ChevronRight className="w-4 h-4 text-gray-400 mt-1" />}
-                      </div>
-                    ))}
-                  </motion.div>
+                  <MenuList items={mainMenu} onSelect={(item) => pushMenu(item.sub)} />
                 ) : (
-                  <motion.div
-                    key="sub"
-                    initial={{ opacity: 0, x: shouldReduce ? 0 : 50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: shouldReduce ? 0 : -50 }}
-                    transition={{ duration: 0.3 }}
-                    className="space-y-3"
-                  >
+                  <motion.div key={`level-${menuStack.length}`} initial={{ opacity: 0, x: shouldReduce ? 0 : 50 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: shouldReduce ? 0 : -50 }} transition={{ duration: 0.3 }} className="space-y-3">
                     <button
                       onClick={menuStack.length > 0 ? popMenu : close}
                       className="flex items-center gap-2 text-gray-600 font-medium mb-2"
                     >
                       <ArrowLeft className="w-4 h-4" /> Back
                     </button>
-                    {menuStack[menuStack.length - 1]?.map((item) => (
-                      <div
-                        key={item.title}
-                        onClick={() => item.sub && pushMenu(item.sub)}
-                        className="flex items-start justify-between p-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition"
-                      >
-                        <div className="flex items-start gap-3">
-                          <item.icon className="w-5 h-5 text-gray-700 mt-1" />
-                          <div>
-                            <h3 className="font-medium text-gray-900">{item.title}</h3>
-                            <p className="text-sm text-gray-500">{item.subtitle}</p>
-                          </div>
-                        </div>
-                        {item.sub && <ChevronRight className="w-4 h-4 text-gray-400 mt-1" />}
-                      </div>
-                    ))}
+                    {menuStack[menuStack.length - 1] && (
+                      <MenuList
+                        items={menuStack[menuStack.length - 1]}
+                        onSelect={(item) => pushMenu(item.sub)}
+                      />
+                    )}
                   </motion.div>
                 )}
               </AnimatePresence>
