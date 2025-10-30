@@ -1,73 +1,89 @@
-# React + TypeScript + Vite
+# Animated Mobile Menu (React + Vite)
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This project is a small React app that shows a modern, mobile‑first menu with smooth animations. It also looks good on desktop.
 
-Currently, two official plugins are available:
+Think of it as the bottom sheet you see in mobile apps: tap a button, a rounded panel slides up with a list of items. You can drill into sub‑menus, go back, and close it by swiping down or tapping the background.
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## What you get
 
-## React Compiler
+- **Smooth animations** for opening, closing, and switching menus
+- **Multi‑level menus** (e.g., Consulting → Technical Consulting → System Architecture)
+- **Responsive** layout (mobile sheet, centered panel on desktop)
+- **Accessible**: keyboard Esc to close, proper dialog roles, reduced‑motion support
+- **External links**: items can open links (e.g., a GitHub repo) in a new tab
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+## How to run
 
-## Expanding the ESLint configuration
+1. Install dependencies
+   - npm install
+2. Start the dev server
+   - npm run dev
+3. Open the app
+   - Visit the printed local URL (usually http://localhost:5173)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Where the important files are
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- src/components/MobileMenu.tsx
+  - The main bottom‑sheet component (overlay, handle, swipe‑to‑close, navigation stack)
+- src/components/menu/MenuList.tsx
+  - Reusable, animated list used for every menu level
+- src/components/menu/data.ts
+  - All the menu items live here, including deep sub‑menus
+- src/components/menu/types.ts
+  - Type for a menu item
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+## Editing the menu
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+Open src/components/menu/data.ts.
+
+- Each item has:
+  - icon: a Lucide icon
+  - title: main label
+  - subtitle: smaller helper text
+  - sub: optional array of child items (for sub‑menus)
+  - href: optional link (opens in a new tab if provided)
+
+Example:
+
+```ts
+{
+  icon: Github,
+  title: "GitHub",
+  subtitle: "Project repository",
+  href: "https://github.com/aadarsh214/2hour",
+}
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+If an item has `sub`, tapping it opens the next level. If it has `href` and no `sub`, it opens the link.
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
+## How the animations work
 
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
-```
+- We use Framer Motion.
+- The sheet uses a spring slide‑up animation and supports **drag down to close**.
+- The lists (MenuList) use **slide + stagger** for item fade/slide.
+- If the OS has “Reduce Motion” enabled, animations are simplified automatically.
+
+## Using the menu
+
+- Click “Open Menu”
+- Tap a row with a chevron to go deeper
+- Tap “Back” to go up a level
+- Tap the background, swipe down, or press Esc to close
+
+## Desktop behavior
+
+- On wider screens, the sheet is centered and slightly lifted from the bottom with rounded corners.
+
+## Tech stack
+
+- React + TypeScript + Vite
+- Tailwind CSS (styles)
+- Framer Motion (animations)
+- Lucide React (icons)
+
+## Notes
+
+- You can rename items and add new sections by editing data.ts only—no code changes needed.
+- To route to your app pages instead of external links, replace the `href` with your router action in `MenuList`.
+
+Enjoy building!

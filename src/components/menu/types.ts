@@ -5,5 +5,6 @@ export interface MenuItem {
   title: string;
   subtitle: string;
   sub?: MenuItem[];
+  href?: string;
 }
 

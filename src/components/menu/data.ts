@@ -15,6 +15,7 @@ import {
   Server,
   Shield,
   Zap,
+  Github,
 } from "lucide-react";
 import type { MenuItem } from "./types";
 
@@ -40,6 +41,7 @@ export const mainMenu: MenuItem[] = [
               { icon: Server, title: "System Architecture", subtitle: "Scalable system design and planning" },
               { icon: Zap, title: "Performance Optimization", subtitle: "Application and system optimization" },
               { icon: Shield, title: "Security Audits", subtitle: "Comprehensive security assessments" },
+              { icon: Github, title: "GitHub", subtitle: "Project repository", href: "https://github.com/aadarsh214/2hour" },
             ],
           },
           { icon: TrendingUp, title: "Business Strategy", subtitle: "Digital transformation and business planning" },

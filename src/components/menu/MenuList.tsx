@@ -4,15 +4,15 @@ import { ChevronRight } from "lucide-react";
 import type { MenuItem } from "./types";
 
 const listVariants = {
-  hidden: { opacity: 0, x: 40 },
-  visible: { opacity: 1, x: 0, transition: { when: "beforeChildren", staggerChildren: 0.035 } },
-  exit: { opacity: 0, x: -40 },
+  hidden: { opacity: 0, x: 36 },
+  visible: { opacity: 1, x: 0, transition: { when: "beforeChildren", staggerChildren: 0.02 } },
+  exit: { opacity: 0, x: -32 },
 };
 
 const itemVariants = {
-  hidden: { opacity: 0, y: 6 },
-  visible: { opacity: 1, y: 0 },
-  exit: { opacity: 0, y: -6 },
+  hidden: { opacity: 0, y: 4 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.16 } },
+  exit: { opacity: 0, y: -4, transition: { duration: 0.14 } },
 };
 
 export interface MenuListProps {
@@ -21,6 +21,13 @@ export interface MenuListProps {
 }
 
 const MenuList: React.FC<MenuListProps> = ({ items, onSelect }) => {
+  const handleClick = (item: MenuItem) => {
+    if (item.sub && item.sub.length) return onSelect(item);
+    if (item.href) {
+      window.open(item.href, "_blank", "noopener,noreferrer");
+    }
+  };
+
   return (
     <motion.div
       key={items.map((i) => i.title).join("|")}
@@ -28,14 +35,14 @@ const MenuList: React.FC<MenuListProps> = ({ items, onSelect }) => {
       initial="hidden"
       animate="visible"
       exit="exit"
-      transition={{ duration: 0.25 }}
+      transition={{ duration: 0.18 }}
       className="space-y-3"
     >
       {items.map((item) => (
         <motion.div
           key={item.title}
           variants={itemVariants}
-          onClick={() => item.sub && onSelect(item)}
+          onClick={() => handleClick(item)}
           className="flex items-start justify-between p-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition"
         >
           <div className="flex items-start gap-3">
