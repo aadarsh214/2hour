@@ -13,6 +13,10 @@ import {
   ArrowLeft,
   ChevronRight,
   GripHorizontal,
+  Cloud,
+  Code2,
+  Workflow,
+  UsersRound,
   Server,
   Shield,
   Zap,
@@ -39,18 +43,94 @@ const mainMenu: MenuItem[] = [
     sub: [
       {
         icon: Server,
-        title: "System Architecture",
-        subtitle: "Scalable system design and planning",
+        title: "Software Solutions",
+        subtitle: "Custom software development and deployment",
       },
       {
-        icon: Zap,
-        title: "Performance Optimization",
-        subtitle: "Application and system optimization",
+        icon: Cloud,
+        title: "Cloud & Infrastructure",
+        subtitle: "Scalable cloud solutions and infrastructure",
+      },
+      {
+        icon: Headphones, // reusing to keep bundle small; represents consulting
+        title: "Consulting Services",
+        subtitle: "Expert guidance and strategic support",
+        sub: [
+          {
+            icon: Server,
+            title: "Technical Consulting",
+            subtitle: "Architecture and implementation guidance",
+            sub: [
+              {
+                icon: Server,
+                title: "System Architecture",
+                subtitle: "Scalable system design and planning",
+              },
+              {
+                icon: Zap,
+                title: "Performance Optimization",
+                subtitle: "Application and system optimization",
+              },
+              {
+                icon: Shield,
+                title: "Security Audits",
+                subtitle: "Comprehensive security assessments",
+              },
+            ],
+          },
+          {
+            icon: TrendingUp,
+            title: "Business Strategy",
+            subtitle: "Digital transformation and business planning",
+          },
+          {
+            icon: BookOpen,
+            title: "Training & Workshops",
+            subtitle: "Team skill development and knowledge transfer",
+            sub: [
+              {
+                icon: Code2,
+                title: "Technical Training",
+                subtitle: "Programming and technology skills",
+              },
+              {
+                icon: Workflow,
+                title: "Agile Methodologies",
+                subtitle: "Scrum, Kanban, and agile practices",
+              },
+              {
+                icon: UsersRound,
+                title: "Leadership & Management",
+                subtitle: "Technical leadership and team management",
+              },
+            ],
+          },
+        ],
+      },
+      {
+        icon: Lightbulb,
+        title: "Digital Transformation",
+        subtitle: "Comprehensive digital transformation strategies",
       },
       {
         icon: Shield,
-        title: "Security Audits",
-        subtitle: "Comprehensive security assessments",
+        title: "Cybersecurity Consulting",
+        subtitle: "Comprehensive cybersecurity solutions",
+      },
+      {
+        icon: BookOpen,
+        title: "Data & Analytics Consulting",
+        subtitle: "Data strategy, analytics, and business intelligence",
+      },
+      {
+        icon: Zap,
+        title: "DevOps & Platform Engineering",
+        subtitle: "DevOps transformation and platform engineering",
+      },
+      {
+        icon: Headphones,
+        title: "Support & Maintenance",
+        subtitle: "Ongoing maintenance and support services",
       },
     ],
   },
@@ -93,7 +173,8 @@ const mainMenu: MenuItem[] = [
 
 const MobileMenu: React.FC = () => {
   const [open, setOpen] = useState<boolean>(false);
-  const [submenu, setSubmenu] = useState<MenuItem[] | null>(null);
+  // Stack of menus to support multi-level navigation
+  const [menuStack, setMenuStack] = useState<MenuItem[][]>([]);
   const shouldReduce = useReducedMotion();
   const sheetRef = useRef<HTMLDivElement | null>(null);
 
@@ -109,13 +190,26 @@ const MobileMenu: React.FC = () => {
   }, [open]);
 
   const close = useCallback(() => {
-    setSubmenu(null);
+    setMenuStack([]);
     setOpen(false);
   }, []);
 
-  const openSub = useCallback((items?: MenuItem[]) => {
-    if (items) setSubmenu(items);
+  const pushMenu = useCallback((items?: MenuItem[]) => {
+    if (items && items.length) setMenuStack((s) => [...s, items]);
   }, []);
+
+  const popMenu = useCallback(() => {
+    setMenuStack((s) => s.slice(0, -1));
+  }, []);
+
+  // ESC to close
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") close();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [close]);
 
   return (
     <div className="min-h-dvh flex items-center justify-center bg-gray-100">
@@ -156,7 +250,7 @@ const MobileMenu: React.FC = () => {
               onDragEnd={(_, info) => {
                 if (info.offset.y > 120 || info.velocity.y > 800) close();
               }}
-              className="fixed bottom-0 left-0 right-0 bg-white rounded-t-3xl shadow-xl max-h-[85dvh] md:max-w-md md:left-1/2 md:-translate-x-1/2 overflow-hidden"
+              className="fixed bottom-0 md:bottom-6 left-0 right-0 bg-white rounded-t-3xl md:rounded-3xl shadow-xl max-h-[92dvh] md:max-w-lg lg:max-w-xl md:left-1/2 md:-translate-x-1/2 overflow-hidden"
             >
               {/* Handle */}
               <div className="sticky top-0 z-10 bg-white/80 backdrop-blur supports-[backdrop-filter]:bg-white/60 px-5 pt-3 pb-2 border-b border-gray-100">
@@ -165,9 +259,9 @@ const MobileMenu: React.FC = () => {
                 </div>
               </div>
 
-              <div className="overflow-y-auto p-5 pt-3 max-h-[calc(85dvh-44px)]">
+              <div className="overflow-y-auto p-5 pt-3 max-h-[calc(92dvh-44px)]">
               <AnimatePresence mode="wait">
-                {!submenu ? (
+                {menuStack.length === 0 ? (
                   <motion.div
                     key="main"
                     initial={{ opacity: 0, x: shouldReduce ? 0 : 50 }}
@@ -179,7 +273,7 @@ const MobileMenu: React.FC = () => {
                     {mainMenu.map((item) => (
                       <div
                         key={item.title}
-                        onClick={() => openSub(item.sub)}
+                        onClick={() => pushMenu(item.sub)}
                         className="flex items-start justify-between p-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition"
                       >
                         <div className="flex items-start gap-3">
@@ -203,14 +297,15 @@ const MobileMenu: React.FC = () => {
                     className="space-y-3"
                   >
                     <button
-                      onClick={() => setSubmenu(null)}
+                      onClick={menuStack.length > 0 ? popMenu : close}
                       className="flex items-center gap-2 text-gray-600 font-medium mb-2"
                     >
                       <ArrowLeft className="w-4 h-4" /> Back
                     </button>
-                    {submenu.map((item) => (
+                    {menuStack[menuStack.length - 1]?.map((item) => (
                       <div
                         key={item.title}
+                        onClick={() => item.sub && pushMenu(item.sub)}
                         className="flex items-start justify-between p-3 rounded-xl hover:bg-gray-50 active:bg-gray-100 cursor-pointer transition"
                       >
                         <div className="flex items-start gap-3">
@@ -220,6 +315,7 @@ const MobileMenu: React.FC = () => {
                             <p className="text-sm text-gray-500">{item.subtitle}</p>
                           </div>
                         </div>
+                        {item.sub && <ChevronRight className="w-4 h-4 text-gray-400 mt-1" />}
                       </div>
                     ))}
                   </motion.div>
